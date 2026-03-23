@@ -10,6 +10,7 @@ public interface IterativeImprovementProblem {
     public boolean isGoalState(State s);
     public List<Action> getActions(State s);
     public State getBestNeighbor(State s);
+    public State getNextNeighbor(State s, int iteration);
     public List<State> getNeighborhood(State s);
     public int getHeuristic(State s);
     public boolean isActionValid(Action a);
