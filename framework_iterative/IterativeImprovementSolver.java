@@ -1,5 +1,6 @@
 package framework_iterative;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -16,7 +17,7 @@ public class IterativeImprovementSolver {
         Node node = new Node();
         node.setState(p.getState());
 
-        return hillClimbing(p);
+        return simulatedAnnealing(p);
     }
 
     public State hillClimbing(IterativeImprovementProblem p){
@@ -76,14 +77,16 @@ public class IterativeImprovementSolver {
     public State simulatedAnnealing(IterativeImprovementProblem p){
         Random random = new Random();
 
-        Node currentNode = new Node();
-        currentNode.setState(p.getState());
-        currentNode.setH(p.getHeuristic(currentNode.getState()));
+        State currentState = p.getState();
+        int currentH = p.getHeuristic(currentState);
         float T = 0;
 
         State neighborState;
-        List<State> neighborhood;
         int neighborH;
+
+        boolean stateChanged = false;
+        List<Action> actions = p.getActions(currentState);
+        Collections.shuffle(actions);
 
         int deltaH = 0;
 
@@ -91,21 +94,35 @@ public class IterativeImprovementSolver {
             T = coolingFunction(t);
 
             if(T == 0)
-                return currentNode.getState();
-            
-            neighborhood = p.getNeighborhood(currentNode.getState());
-            neighborState = neighborhood.get(random.nextInt(neighborhood.size()));
+                return currentState;
+
+            if(stateChanged){
+                actions = p.getActions(currentState);
+                Collections.shuffle(actions);
+                stateChanged = false;
+            }else{
+                if(actions.isEmpty()){
+                    actions = p.getActions(currentState);
+                    Collections.shuffle(actions);
+                }
+            }
+
+            neighborState = p.performActionOnState(currentState, actions.removeLast());
             neighborH = p.getHeuristic(neighborState);
 
-            if(neighborH < currentNode.getH()){
-                currentNode.setState(neighborState);
-                currentNode.setH(neighborH);
+            if(neighborH < currentH){
+                currentState = neighborState;
+                currentH = neighborH;
+
+                stateChanged = true;
             }else{
-                deltaH = Math.abs(neighborH - currentNode.getH());
+                deltaH = Math.abs(neighborH - currentH);
                 //probability of e^deltaE/T
                 if(takeShot(Math.exp((double)-deltaH / (double)T), random)){
-                    currentNode.setState(neighborState);
-                    currentNode.setH(neighborH);
+                    currentState = neighborState;
+                    currentH = neighborH;
+
+                    stateChanged = true;
                 }
             }
         }

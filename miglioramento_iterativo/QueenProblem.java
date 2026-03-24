@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collector;
 
 import framework.Action;
 import framework.State;
@@ -59,18 +60,6 @@ public class QueenProblem implements IterativeImprovementProblem{
             }
         }
         return actionsList;
-
-        //0
-
-        //1
-
-        //2  
-
-        //3
-
-        //4
-
-        //QueenAction qa = new QueenAction(new Point(), null)
     }
 
     @Override
@@ -79,16 +68,18 @@ public class QueenProblem implements IterativeImprovementProblem{
         int countAttacks = 0;
 
         for(Point p : queenState.getQueenPositions()){
-                if(queenState.getQueenPositions().stream().filter(_p -> _p.x > p.x && _p.y == p.y).findAny().isPresent()){
-                    countAttacks++;
-                }
-                if(queenState.getQueenPositions().stream().filter(_p -> _p.y > p.y && _p.x == p.x).findAny().isPresent()){
-                    countAttacks++;
-                }
-                if (queenState.getQueenPositions().stream()
-                    .anyMatch(_p -> (_p.x != p.x || _p.y != p.y) && Math.abs(_p.x - p.x) == Math.abs(_p.y - p.y))) {
-                    countAttacks++;
-                }
+                countAttacks += (int) queenState.getQueenPositions().stream()
+                    .filter(_p -> _p.x > p.x && _p.y == p.y)
+                    .count();
+
+                countAttacks += (int) queenState.getQueenPositions().stream()
+                    .filter(_p -> _p.y > p.y && _p.x == p.x)
+                    .count();
+
+                countAttacks += (int) queenState.getQueenPositions().stream()
+                .filter(_p -> (_p.x > p.x) && Math.abs(_p.x - p.x) == Math.abs(_p.y - p.y))
+                .count();
+
         }
 
         return countAttacks;
@@ -108,10 +99,11 @@ public class QueenProblem implements IterativeImprovementProblem{
         QueenState newState = new QueenState();
         
         for(Point p : qs.getQueenPositions()){
-            newState.addQueen(new Point(p.x, p.y));
+            if (!p.equals(qa.getTargetQueen())) {
+                newState.addQueen(p); 
+            }
         }
-
-        newState.getQueenPositions().remove(qa.getTargetQueen());
+        
         newState.getQueenPositions().add(qa.getTargetPosition());
 
         return newState;
@@ -125,24 +117,31 @@ public class QueenProblem implements IterativeImprovementProblem{
     @Override
     public State getBestNeighbor(State s) {
         // Find the s state heuristic
-        int currentH = this.getHeuristic(s);
-        
+        int bestH = this.getHeuristic(s);
+        List<QueenState> currentBest = new ArrayList<>();
 
         // Randomly choose a column
-        Collections.shuffle(state.getQueenPositions());
+        // Collections.shuffle(state.getQueenPositions());
         List<Action> legalActions = this.getActions(s);
 
         // Move to a random row starting from the littlest one
         for(Action a : legalActions){
             State possibleNewState = performActionOnState(s, a);
-            if(getHeuristic(possibleNewState) < currentH){
-                System.out.println("Find a better one: " + getHeuristic(possibleNewState) + " previous: " + currentH);
-                //NOTE: Save here a equal one(?)
-                return possibleNewState;
+            int possibleNewH = getHeuristic(possibleNewState);
+
+            if(possibleNewH > bestH)
+                continue;
+
+            if(possibleNewH < bestH){
+                bestH = possibleNewH;
+                currentBest.clear();
             }
+            
+            currentBest.add((QueenState)possibleNewState);
         }
 
-        return s;
+        Collections.shuffle(currentBest);
+        return !currentBest.isEmpty() ? currentBest.getLast() : null;
     }
 
     @Override

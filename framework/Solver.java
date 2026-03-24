@@ -35,7 +35,7 @@ public class Solver {
     }
 
     List<Action> solve(Problem p, int depthLimit){
-        boolean PRINT_TRACE = true;
+        boolean PRINT_TRACE = false;
 
         Node node = new Node();
         node.setG(0);

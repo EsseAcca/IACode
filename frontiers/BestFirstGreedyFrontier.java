@@ -67,4 +67,15 @@ public class BestFirstGreedyFrontier implements Frontier{
         return sBuilder.toString();
     }
 
+    @Override
+    public void removeNode(Node n) {
+        for (java.util.Iterator<Node> it = nodes.iterator(); it.hasNext();) {
+            Node node = it.next();
+            if (node.getState().equals(n.getState())) {
+                it.remove();
+                break;
+            }
+        }
+    }
+
 }
