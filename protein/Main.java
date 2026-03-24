@@ -12,35 +12,82 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        // 1. Default fallback values
         String sequence = "PHPHPHPPH";
+        String algorithm = "astar";
+
+        // 2. Parse arguments if provided
+        if (args.length >= 1) {
+            sequence = args[0].toUpperCase();
+        }
+        if (args.length >= 2) {
+            algorithm = args[1].toLowerCase();
+        }
+
+        System.out.println("==================================================");
+        System.out.println("Starting Protein Folding Search");
+        System.out.println("Sequence : " + sequence);
+        System.out.println("Algorithm: " + algorithm.toUpperCase());
+        System.out.println("==================================================");
+
+        // 3. Initialize Problem and Solver
         Problem problem = new ProteinProblem(sequence);
+        Solver solver = null;
 
-        Solver solver = new Solver(new AStarFrontier());
-        
+        switch (algorithm) {
+            case "astar":
+                solver = new Solver(new AStarFrontier());
+                break;
+            case "mincost":
+                solver = new Solver(new MinCostFrontier());
+                break;
+            default:
+                System.out.println("Error: Unknown algorithm '" + algorithm + "'.");
+                printUsage();
+                return;
+        }
+
+        // 4. Run the Search and Time it
+        long startTime = System.currentTimeMillis();
         List<Action> solution = solver.solve(problem);
+        long endTime = System.currentTimeMillis();
+        float executionTimeSec = (endTime - startTime) / 1000.0f;
 
+        // 5. Output Results
         if (solution != null) {
-            System.out.println("Solution found in " + solution.size() + " steps:");
+            System.out.println("\n--- RESULTS ---");
+            System.out.println("Solution found in " + solution.size() + " steps!");
+            System.out.println("Execution Time: " + executionTimeSec + " seconds");
             
             State currentState = problem.getInitialState();
+            int finalEnergy = 0;
+            
+            System.out.println("\nExecution Trace:");
             for (Action a : solution) {
                 ProteinAction pa = (ProteinAction) a;
                 System.out.println(" -> Move " + pa.getDirection() + " (Action Cost: " + pa.getCost() + ")");
+                finalEnergy += a.getCost();
                 currentState = problem.performActionOnState(currentState, pa);
             }
             
             printProteinGrid((ProteinState) currentState, sequence);
-
-            int finalEnergy = 0;
-            for (Action a : solution) {
-                finalEnergy += a.getCost(); 
-            }
             
             System.out.println("\nFinal Total Energy: " + finalEnergy);
+            System.out.println("==================================================");
             
         } else {
-            System.out.println("No valid non-crossing conformation found.");
+            System.out.println("\nNo valid non-crossing conformation found.");
+            System.out.println("Execution Time: " + executionTimeSec + " seconds");
         }
+    }
+
+    private static void printUsage() {
+        System.out.println("\nUsage: java protein.Main [sequence] [algorithm]");
+        System.out.println("Algorithms:");
+        System.out.println("  astar   - Runs A* Search (Requires Admissible Heuristic)");
+        System.out.println("  mincost - Runs Min-Cost Search (Uniform Cost Search)");
+        System.out.println("\nExample:");
+        System.out.println("  java protein.Main HHPHPHPHPH astar");
     }
 
     public static void printProteinGrid(ProteinState state, String sequence) {

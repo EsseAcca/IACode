@@ -1,0 +1,7 @@
+Compile on Windows:
+
+javac framework\*.java framework_iterative\*.java general\*.java miglioramento_iterativo\*.java protein\*.java
+
+Compile on Linux/MaxOs:
+
+javac framework/*.java framework_iterative/*.java general/*.java miglioramento_iterativo/*.java protein/*.java
