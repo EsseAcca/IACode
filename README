@@ -1,7 +1,49 @@
-Compile on Windows:
+# Intelligenza Artificiale - Progetto di Ricerca
+**Autore:** [Il tuo nome e cognome]
+**Matricola:** [La tua matricola]
+**Corso:** Intelligenza Artificiale (Prof. Toni Mancini)
 
-javac framework\*.java framework_iterative\*.java general\*.java miglioramento_iterativo\*.java protein\*.java
+## Descrizione del Progetto
+Questo progetto contiene l'implementazione di due domini di ricerca:
+1. **N-Queens (Miglioramento Iterativo):** Risolto utilizzando Steepest Ascent, First-Choice Hill Climbing e Simulated Annealing (con Random Restart wrapper).
+2. **Protein Folding (Ricerca su Grafo/Albero):** Risolto utilizzando A* Search (con euristica ammissibile) e Min-Cost Search.
 
-Compile on Linux/MaxOs:
+---
 
-javac framework/*.java framework_iterative/*.java general/*.java miglioramento_iterativo/*.java protein/*.java
+## Istruzioni per la Compilazione
+
+Per mantenere pulita la cartella dei sorgenti (`src`), i file compilati `.class` verranno generati nella cartella `bin`.
+
+Aprire il terminale nella directory radice del progetto (dove si trova questo file README) ed eseguire il seguente comando:
+
+**Su Windows:**
+> javac -d bin src\framework\*.java src\framework_iterative\*.java src\frontiers\*.java src\general\*.java src\miglioramento_iterativo\*.java src\protein\*.java
+
+**Su Mac/Linux:**
+> javac -d bin src/framework/*.java src/framework_iterative/*.java src/frontiers/*.java src/general/*.java src/miglioramento_iterativo/*.java src/protein/*.java
+
+---
+
+## Istruzioni per l'Esecuzione
+
+Una volta compilato il codice, utilizzare il flag `-cp bin` per indicare a Java dove trovare i file compilati. Eseguire i comandi sempre dalla directory radice.
+
+### 1. N-Queens (Miglioramento Iterativo)
+Il programma accetta tre argomenti opzionali: `<algoritmo> <dimensione_scacchiera> <iterazioni>`
+
+**Algoritmi disponibili:** `steepest`, `firstchoice`, `annealing`, `restart-steepest`, `restart-firstchoice`
+
+**Esempi di esecuzione:**
+> java -cp bin miglioramento_iterativo.Main steepest 8 100000
+> java -cp bin miglioramento_iterativo.Main restart-firstchoice 8
+> java -cp bin miglioramento_iterativo.Main annealing 16 1000
+
+### 2. Protein Folding
+Il programma accetta due argomenti opzionali: `<sequenza_proteina> <algoritmo>`
+
+**Algoritmi disponibili:**
+`astar`, `mincost`
+
+**Esempi di esecuzione:**
+> java -cp bin protein.Main PHPHPHPPH astar
+> java -cp bin protein.Main HHHPHPH mincost
