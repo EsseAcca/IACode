@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import csp.CspState;
 import framework.Action;
 import framework.Node;
 import framework.State;
@@ -59,6 +60,8 @@ public class IterativeImprovementSolver {
         State currentState = p.getState();
         int currentH = p.getHeuristic(currentState);
 
+        // System.out.println("Current State: " + ((CspState)p.getState()).getX() + " | Cost: " + currentH);
+
         while(true){
             State neighborState = p.getBestNeighbor(currentState);
             if(neighborState == null)
@@ -68,6 +71,9 @@ public class IterativeImprovementSolver {
             if(currentH <= neighborH){
                 return currentState;
             }
+
+            // System.out.println("New State: " + ((CspState)neighborState).getX() + " | Cost: " + neighborH);
+            
 
             currentState = neighborState;
             currentH = neighborH;
